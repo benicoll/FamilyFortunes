@@ -20,9 +20,7 @@ var incorrectGuesses = JSON.parse(localStorage.getItem('incorrectGuesses') || "[
 var correctGuesses = JSON.parse(localStorage.getItem('correctGuesses') || "[]");
 
 //if there are localstorage values, display the already guessed answers on the scoreboard
-if((incorrectGuesses.length > 0) || (correctGuesses.length > 0)) {
-	revealGuesses();
-}
+resetGuessStorage();
 
 $('form').submit(function(e){
 	e.preventDefault();
@@ -118,11 +116,14 @@ function stripWhitespace(sentence) {
 	return sentence.replace(/\s/g, '');
 }
 
-//remove localstorage items and refresh the browser
-$('#clear').on('click', function(){
+function resetGuessStorage() {
 	localStorage.removeItem('incorrectGuesses');
 	localStorage.removeItem('correctGuesses');
+}
 
+//remove localstorage items and refresh the browser
+$('#clear').on('click', function(){
+	resetGuessStorage();
 	location.reload();
 });
 
