@@ -1,23 +1,28 @@
-for(var i = 0; i<answers.length; i++){
-	var answerRow = '<div class="answer" id="' + stripWhitespace(answers[i].value) + '">' +
-	                '    <div class="answer__number">' + parseInt(i + 1) + '</div>' +
-	                '    <div class="answer__value"><span style="display: none;">' + answers[i].value + '</span></div>' +
-	                '    <div class="answer__stat"><span style="display: none;">' + answers[i].stat + '</span></div>' +
-	                '</div>';
+var incorrectGuesses, correctGuesses, answerRow, scoreRow;
 
-	$('#answerTable').append(answerRow);
-}
-var scoreRow = '<div class="answer" id="totalScore">' +
-				'    <div class="answer__number"></div>' +
-				'    <div class="answer__value"><span>total</span></div>' +
-				'    <div class="answer__stat"><span id="runningTotal">0</span></div>' +
-				'</div>';
-$('#answerTable').append(scoreRow);
+window.onload = function(){
+	for(var i = 0; i<answers.length; i++){
+		answerRow = '<div class="answer" id="' + stripWhitespace(answers[i].value) + '">' +
+		                '    <div class="answer__number">' + parseInt(i + 1) + '</div>' +
+		                '    <div class="answer__value"><span style="display: none;">' + answers[i].value + '</span></div>' +
+		                '    <div class="answer__stat"><span style="display: none;">' + answers[i].stat + '</span></div>' +
+		                '</div>';
 
-var incorrectGuesses = JSON.parse(localStorage.getItem('incorrectGuesses') || "[]");
-var correctGuesses = JSON.parse(localStorage.getItem('correctGuesses') || "[]");
+		$('#answerTable').append(answerRow);
+	}
+	scoreRow = '<div class="answer" id="totalScore">' +
+					'    <div class="answer__number"></div>' +
+					'    <div class="answer__value"><span>total</span></div>' +
+					'    <div class="answer__stat"><span id="runningTotal">0</span></div>' +
+					'</div>';
+	$('#answerTable').append(scoreRow);
 
-resetGuessStorage();
+	incorrectGuesses = JSON.parse(localStorage.getItem('incorrectGuesses') || "[]");
+	correctGuesses = JSON.parse(localStorage.getItem('correctGuesses') || "[]");
+
+	resetGuessStorage();
+};
+
 
 $('form').submit(function(e){
 	e.preventDefault();
@@ -42,6 +47,10 @@ $('form').submit(function(e){
 			console.log(currentTotal);
 			$('#runningTotal').text(currentTotal + answer.stat);
 
+			if(incorrectGuesses.length == 3){
+				outOfGuesses();
+			}
+
 		} else {
 			wrongAudio.play();
 			incorrectGuesses.push(guess);
@@ -51,15 +60,19 @@ $('form').submit(function(e){
 
 			$('ul#guessList').append('<li>' + guess + '</li>');
 
-			if(incorrectGuesses.length >= 3){
-				$('form input#submit').prop("disabled", true);
-				$('#showAnswers').show();
+			if(incorrectGuesses.length >= 4){
+				outOfGuesses();
 			}
 		}
 	}
 
 	$input.val('');
 });
+
+function outOfGuesses() {
+	$('form input#submit').prop("disabled", true);
+	$('#showAnswers').show();
+}
 
 function checkAnswer(guess){
 	for(var i = 0; i<answers.length; i++){
@@ -102,7 +115,9 @@ function stripWhitespace(sentence) {
 
 function resetGuessStorage() {
 	localStorage.removeItem('incorrectGuesses');
+	incorrectGuesses = [];
 	localStorage.removeItem('correctGuesses');
+	correctGuesses = [];
 }
 
 $('#clear').on('click', function(){
