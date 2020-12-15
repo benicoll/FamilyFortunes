@@ -46,11 +46,6 @@ $('form').submit(function(e){
 			currentTotal = parseInt($('#runningTotal').text());
 			console.log(currentTotal);
 			$('#runningTotal').text(currentTotal + answer.stat);
-
-			if(incorrectGuesses.length == 3){
-				outOfGuesses();
-			}
-
 		} else {
 			wrongAudio.play();
 			incorrectGuesses.push(guess);
@@ -60,19 +55,18 @@ $('form').submit(function(e){
 
 			$('ul#guessList').append('<li>' + guess + '</li>');
 
+			if(incorrectGuesses.length == 3){
+				$('#showAnswers').show();
+			}
+
 			if(incorrectGuesses.length >= 4){
-				outOfGuesses();
+				$('form input#submit').prop("disabled", true);
 			}
 		}
 	}
 
 	$input.val('');
 });
-
-function outOfGuesses() {
-	$('form input#submit').prop("disabled", true);
-	$('#showAnswers').show();
-}
 
 function checkAnswer(guess){
 	for(var i = 0; i<answers.length; i++){
